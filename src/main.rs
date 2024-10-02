@@ -13,7 +13,7 @@ mod twitch_api_handler;
 
 #[tokio::main]
 pub async fn main() {
-    const CHAT_CHANNEL: &str = "#minotwar";
+    const CHAT_CHANNEL: &str = "minotwar";
 
     dotenv().ok();
     let client_id = env::var("TWITCH_CLIENT_ID".to_owned()).unwrap();
@@ -37,7 +37,6 @@ pub async fn main() {
                     let (join_requested, is_connected) = client_clone.get_channel_status(CHAT_CHANNEL.to_string()).await;
                     if msg.message_text.contains("test") && join_requested && is_connected {
                         let _ = client_clone.say(CHAT_CHANNEL.to_string(), String::from("I'm alive!")).await;
-                        println!("AWWWWWW YEEEEEAAAAAHHHHHH");
                     }
                     println!("PRIVMSG -> {} {}", msg.channel_login, msg.sender.name);
                 },

@@ -39,7 +39,7 @@ impl OAuthStorage {
     else {
       req_body.insert("code", token_string);
       req_body.insert("grant_type", "authorization_code".to_owned());
-      req_body.insert("redirect_uri", "localhost:3000".to_owned());
+      req_body.insert("redirect_uri", "http://localhost:3000".to_owned());
     }
   
     let response = Client::new()
@@ -47,6 +47,7 @@ impl OAuthStorage {
       .form(&req_body)
       .send().await?
       .text().await?;
+    let str_response = response.as_str();
     let decoded: GetAccessTokenResponse = serde_json::from_str(response.as_str()).unwrap();
     let user_access_token: UserAccessToken = UserAccessToken::from(decoded);
   
@@ -64,10 +65,7 @@ impl OAuthStorage {
     let expires_at = expires_at.unwrap().to_rfc3339(); // Ok to overwrite since we don't need a date object
     let created_at = created_at.to_rfc3339();
     let new_contents = format!(
-      "TWITCH_ACCESS_TOKEN={access_token}
-      TWITCH_REFRESH_TOKEN={refresh_token}
-      TWITCH_TOKEN_EXPIRES_AT={expires_at}
-      TWITCH_TOKEN_CREATED_AT={created_at}"
+      "TWITCH_ACCESS_TOKEN={access_token}\nTWITCH_REFRESH_TOKEN={refresh_token}\nTWITCH_TOKEN_EXPIRES_AT={expires_at}\nTWITCH_TOKEN_CREATED_AT={created_at}"
     );
 
     fs::write(OAuthStorage::TOKEN_AUTH_FILE, new_contents)
